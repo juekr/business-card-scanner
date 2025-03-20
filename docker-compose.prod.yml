@@ -10,10 +10,13 @@ services:
       - MAX_WORKERS=4
       - TESSERACT_PATH=/usr/bin/tesseract
       - TESSDATA_PREFIX=/usr/share/tesseract-ocr/4.00/tessdata
+      - TESSERACT_LANG=deu
+      - API_KEY=${API_KEY}
+      - ALLOWED_ORIGINS=${ALLOWED_ORIGINS}
     volumes:
       - ./storage:/app/storage
-    ports:
-      - "127.0.0.1:8000:8000"
+    expose:
+      - "8000"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
