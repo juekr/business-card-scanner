@@ -42,17 +42,13 @@ class Settings(BaseSettings):
 
     @validator("ALLOWED_ORIGINS", pre=True)
     def parse_allowed_origins(cls, v):
-        if isinstance(v, str):
-            # Versuche zuerst als JSON zu parsen
-            try:
-                import json
-                return json.loads(v)
-            except json.JSONDecodeError:
-                # Wenn JSON-Parsing fehlschlägt, behandle es als komma-separierte Liste
-                return [origin.strip() for origin in v.split(",") if origin.strip()]
-        elif isinstance(v, list):
+        if isinstance(v, list):
             return v
-        return ["http://localhost:3000"]  # Fallback-Wert
+        if isinstance(v, str):
+            # Entferne eventuelle Leerzeichen und leere Einträge
+            origins = [origin.strip() for origin in v.split(",")]
+            return [origin for origin in origins if origin]
+        return ["http://localhost:3000"]
     
     class Config:
         env_file = ".env"
