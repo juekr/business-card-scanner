@@ -46,8 +46,9 @@ COPY --from=builder /usr/share/tesseract-ocr/4.00/tessdata /usr/share/tesseract-
 
 # Tesseract-Konfiguration
 RUN mkdir -p /usr/share/tesseract-ocr/4.00/tessdata/configs && \
-    echo "tessedit_pageseg_mode 1\ntessedit_char_whitelist abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZäöüÄÖÜß0123456789.,- @" > /etc/tesseract-ocr/configs/custom && \
-    echo "deu" > /etc/tesseract-ocr/configs/lang
+    mkdir -p /etc/tesseract-ocr/configs && \
+    echo "tessedit_pageseg_mode 1\ntessedit_char_whitelist abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZäöüÄÖÜß0123456789.,- @" > /usr/share/tesseract-ocr/4.00/tessdata/configs/custom && \
+    echo "deu" > /usr/share/tesseract-ocr/4.00/tessdata/configs/lang
 
 # Nicht-Root Benutzer erstellen
 RUN useradd -m -u 1000 appuser && \
