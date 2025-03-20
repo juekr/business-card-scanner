@@ -17,6 +17,8 @@ services:
       - ./storage:/app/storage
     expose:
       - "8000"
+    networks:
+      - internal
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
@@ -33,14 +35,16 @@ services:
     image: nginx:alpine
     restart: unless-stopped
     ports:
-      - "443:443"
-      - "80:80"
+      - "${NGINX_PORT:-80}:80"
+      - "${NGINX_SSL_PORT:-443}:443"
     volumes:
       - ./nginx/conf.d:/etc/nginx/conf.d
       - ./nginx/ssl:/etc/nginx/ssl
       - ./nginx/www:/var/www/html
     depends_on:
       - api
+    networks:
+      - internal
     healthcheck:
       test: ["CMD", "nginx", "-t"]
       interval: 30s
@@ -92,4 +96,8 @@ services:
 
 volumes:
   prometheus_data:
-  grafana_data: 
+  grafana_data:
+
+networks:
+  internal:
+    driver: bridge 
