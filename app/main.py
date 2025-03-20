@@ -1,5 +1,6 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends, HTTPException, Security
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.security.api_key import APIKeyHeader
 import logging
 from app.api.endpoints import ingest
 from app.core.config import settings
@@ -9,6 +10,17 @@ logging.basicConfig(
     level=settings.LOG_LEVEL,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
 )
+
+# API Key Setup
+api_key_header = APIKeyHeader(name="X-API-Key", auto_error=True)
+
+async def verify_api_key(api_key: str = Security(api_key_header)):
+    if api_key != settings.API_KEY:
+        raise HTTPException(
+            status_code=403,
+            detail="Ungültiger API-Key"
+        )
+    return api_key
 
 # FastAPI App erstellen
 app = FastAPI(
@@ -26,14 +38,15 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Health Check
+# Health Check (ohne API-Key)
 @app.get("/health", tags=["Health"])
 async def health_check():
     return {"status": "healthy"}
 
-# Router einbinden
+# Router einbinden (mit API-Key)
 app.include_router(
     ingest.router,
     prefix="/api/v1",
-    tags=["Ingest"]
+    tags=["Ingest"],
+    dependencies=[Depends(verify_api_key)]
 ) 
