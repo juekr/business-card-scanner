@@ -16,13 +16,22 @@ Dieser Microservice extrahiert Kontaktdaten aus Visitenkarten und anderen Dokume
 - Ausgabe als vCard oder Markdown
 - Debug-Modus für OCR-Optimierung
 - Zuverlässigkeits-Score für extrahierte Daten
+- Unterstützte Bildformate:
+  - JPEG/JPG
+  - PNG
+  - BMP
+  - HEIC
+  - PDF (erste Seite)
+  - GIF
+  - SVG
+  - WebP
 
 ## Installation
 
 ### Voraussetzungen
 
 - Docker und Docker Compose
-- oder Python 3.11+ mit Tesseract OCR
+- oder Python 3.11+ mit Tesseract OCR und Poppler
 
 ### Docker Installation
 
@@ -37,7 +46,7 @@ Dieser Microservice extrahiert Kontaktdaten aus Visitenkarten und anderen Dokume
    docker-compose up -d
    ```
 
-Der Service ist dann unter `http://localhost:8000` erreichbar.
+Der Service ist dann unter `http://localhost:8001` erreichbar.
 
 ### Lokale Installation
 
@@ -60,10 +69,18 @@ Der Service ist dann unter `http://localhost:8000` erreichbar.
    pip install -r requirements.txt
    ```
 
-4. Tesseract OCR installieren:
-   - Linux: `sudo apt-get install tesseract-ocr tesseract-ocr-deu`
-   - Mac: `brew install tesseract`
-   - Windows: [Tesseract Installer](https://github.com/UB-Mannheim/tesseract/wiki)
+4. Tesseract OCR und Poppler installieren:
+   - Linux: 
+     ```bash
+     sudo apt-get install tesseract-ocr tesseract-ocr-deu poppler-utils
+     ```
+   - Mac: 
+     ```bash
+     brew install tesseract poppler
+     ```
+   - Windows: 
+     - [Tesseract Installer](https://github.com/UB-Mannheim/tesseract/wiki)
+     - [Poppler für Windows](http://blog.alivate.com.au/poppler-windows/)
 
 5. Umgebungsvariablen konfigurieren:
    ```bash
@@ -73,7 +90,7 @@ Der Service ist dann unter `http://localhost:8000` erreichbar.
 
 6. Server starten:
    ```bash
-   uvicorn app.main:app --reload
+   uvicorn app.main:app --reload --port 8001
    ```
 
 ## API Endpoints
@@ -84,6 +101,7 @@ Verarbeitet Bilder oder Textdateien und gibt Kontaktdaten zurück.
 
 **Parameter:**
 - `file`: Die zu verarbeitende Datei (Multipart-Form)
+  - Unterstützte Formate: jpg, jpeg, png, bmp, heic, pdf, gif, svg, webp
 - `accept`: Header für das Ausgabeformat
   - `application/vcard+vcf` (Standard)
   - `text/markdown`
@@ -92,7 +110,7 @@ Verarbeitet Bilder oder Textdateien und gibt Kontaktdaten zurück.
 
 **Beispiel:**
 ```bash
-curl -X POST "http://localhost:8000/api/v1/ingest" \
+curl -X POST "http://localhost:8001/api/v1/ingest" \
      -H "accept: application/vcard+vcf" \
      -F "file=@visitenkarte.jpg"
 ```
@@ -107,7 +125,7 @@ Debug-Endpoint für OCR-Optimierung.
 
 **Beispiel:**
 ```bash
-curl -X POST "http://localhost:8000/api/v1/ocr/debug" \
+curl -X POST "http://localhost:8001/api/v1/ocr/debug" \
      -F "file=@visitenkarte.jpg"
 ```
 

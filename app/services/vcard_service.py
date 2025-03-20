@@ -2,60 +2,64 @@ import vobject
 from app.models.contact import Contact
 from typing import Union
 import logging
+from datetime import datetime
 
 logger = logging.getLogger(__name__)
 
 class VCardService:
+    """Service für die Erstellung von vCard-Ausgaben."""
+    
     def create_vcard(self, contact: Contact) -> str:
-        """
-        Erstellt eine vCard aus den Kontaktdaten.
-        """
+        """Erstellt eine vCard-Repräsentation der Kontaktdaten."""
         try:
+            # vCard erstellen
             vcard = vobject.vCard()
             
             # Name
-            vcard.add('n')
-            vcard.n.value = vobject.vcard.Name(
-                family=contact.last_name,
-                given=contact.first_name
-            )
+            vcard.add('n').value = vobject.vcard.Name(family=contact.last_name, given=contact.first_name)
+            vcard.add('fn').value = f"{contact.first_name} {contact.last_name}"
             
-            # Formatierter Name
-            vcard.add('fn')
-            vcard.fn.value = f"{contact.first_name} {contact.last_name}"
-            
-            # Firma
+            # Firma und Position
             if contact.company:
-                vcard.add('org')
-                vcard.org.value = [contact.company]
+                vcard.add('org').value = [contact.company]
+                if contact.position:
+                    vcard.add('title').value = contact.position.strip()
             
-            # Email
-            vcard.add('email')
-            vcard.email.value = contact.email
-            vcard.email.type_param = 'INTERNET'
+            # E-Mail
+            if contact.email:
+                email = vcard.add('email')
+                email.type_param = 'INTERNET'
+                email.value = contact.email.strip()
             
-            # Telefon
-            vcard.add('tel')
-            vcard.tel.value = contact.phone
-            vcard.tel.type_param = 'WORK'
+            # Telefonnummern
+            if contact.phone:
+                phone = vcard.add('tel')
+                phone.type_param = 'WORK'
+                phone.value = contact.phone.strip()
             
-            # Zweite Telefonnummer
-            if contact.secondary_phone:
-                tel = vcard.add('tel')
-                tel.value = contact.secondary_phone
-                tel.type_param = 'CELL'  # oder 'FAX', abhängig vom Kontext
+            if contact.secondary_phone and len(contact.secondary_phone.strip()) > 5:  # Nur echte Telefonnummern
+                phone = vcard.add('tel')
+                phone.type_param = 'CELL'
+                phone.value = contact.secondary_phone.strip()
             
             # Adresse
-            vcard.add('adr')
-            vcard.adr.value = vobject.vcard.Address(
-                street=contact.address.street,
-                city=contact.address.city,
-                code=contact.address.postal_code,
-                country=contact.address.country
-            )
-            vcard.adr.type_param = 'WORK'
+            if contact.address:
+                adr = vcard.add('adr')
+                adr.type_param = 'WORK'
+                adr.value = vobject.vcard.Address(
+                    street=contact.address.street.strip(),
+                    city=contact.address.city.strip(),
+                    code=contact.address.postal_code.strip(),
+                    country=contact.address.country.strip()
+                )
             
-            return vcard.serialize()
+            # Metadaten
+            vcard.add('version').value = '3.0'
+            vcard.add('prodid').value = '-//Business Card Reader//DE'
+            vcard.add('rev').value = datetime.now().strftime('%Y%m%dT%H%M%SZ')
+            
+            # vCard als String zurückgeben und überflüssige Zeilenumbrüche entfernen
+            return vcard.serialize().strip()
             
         except Exception as e:
             logger.error(f"Fehler bei vCard-Erstellung: {str(e)}")
@@ -72,6 +76,8 @@ class VCardService:
             
             if contact.company:
                 markdown.append(f"## {contact.company}")
+                if contact.position:
+                    markdown.append(f"*{contact.position}*")
                 markdown.append("")
             
             markdown.append("### Kontaktdaten")

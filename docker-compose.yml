@@ -2,18 +2,26 @@ version: '3.8'
 
 services:
   api:
-    build: .
+    build:
+      context: .
+      dockerfile: Dockerfile
     ports:
       - "8000:8000"
     volumes:
-      - ./storage:/app/storage
+      - ./app:/app/app  # Für Hot-Reloading
+      - storage:/app/storage
     environment:
-      - DEBUG=False
-      - LOG_LEVEL=INFO
-    restart: unless-stopped
+      - ENVIRONMENT=development
+      - LOG_LEVEL=DEBUG
+      - MAX_WORKERS=1
+      - ENABLE_METRICS=true
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/docs"]
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
       timeout: 10s
       retries: 3
-      start_period: 10s 
+      start_period: 5s
+    restart: unless-stopped
+
+volumes:
+  storage:  # Persistentes Volume für Upload-Dateien 
