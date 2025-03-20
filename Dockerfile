@@ -12,6 +12,7 @@ RUN apt-get update && apt-get install -y \
     libgl1-mesa-glx \
     libglib2.0-0 \
     poppler-utils \
+    libheif-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Arbeitsverzeichnis erstellen
@@ -39,6 +40,7 @@ RUN apt-get update && apt-get install -y \
     libgl1-mesa-glx \
     libglib2.0-0 \
     poppler-utils \
+    libheif-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # Arbeitsverzeichnis erstellen
