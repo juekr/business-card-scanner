@@ -2,7 +2,10 @@ version: '3.8'
 
 services:
   api:
-    image: ${DOCKER_REGISTRY}/business-card-reader:${TAG:-latest}
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: business-card-reader:latest
     restart: unless-stopped
     environment:
       - ENVIRONMENT=production
