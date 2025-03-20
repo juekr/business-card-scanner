@@ -1,0 +1,15 @@
+[project]
+name = "business-card-reader"
+version = "0.1.0"
+description = "Default template for PDM package"
+authors = [
+    {name = "Jürgen Krauß", email = "juergen@es-ist-ein-krauss.de"},
+]
+dependencies = ["flask>=3.1.0", "pytesseract>=0.3.13", "opencv-python-headless>=4.11.0.86", "opencv-contrib-python>=4.11.0.86", "imutils>=0.5.4", "scipy>=1.15.2", "scikit-image>=0.25.2"]
+requires-python = "==3.13.*"
+readme = "README.md"
+license = {text = "MIT"}
+
+
+[tool.pdm]
+distribution = false
