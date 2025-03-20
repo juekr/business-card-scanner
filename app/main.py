@@ -20,15 +20,20 @@ app = FastAPI(
 # CORS Middleware
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In Produktion einschränken!
+    allow_origins=settings.ALLOWED_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+# Health Check
+@app.get("/health", tags=["Health"])
+async def health_check():
+    return {"status": "healthy"}
+
 # Router einbinden
 app.include_router(
     ingest.router,
-    prefix=f"/api/{settings.API_VERSION}",
-    tags=["ingest"]
+    prefix="/api/v1",
+    tags=["Ingest"]
 ) 
