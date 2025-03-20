@@ -65,7 +65,8 @@ ENV PYTHONUNBUFFERED=1 \
     TESSERACT_PATH=/usr/bin/tesseract \
     TESSDATA_PREFIX=/usr/share/tesseract-ocr/4.00/tessdata \
     STORAGE_PATH=/app/storage \
-    PORT=8000
+    PORT=8000 \
+    PATH="/usr/local/bin:${PATH}"
 
 # Health Check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
@@ -75,4 +76,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
 EXPOSE ${PORT}
 
 # Start-Kommando
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"] 
+CMD ["/usr/local/bin/python", "-m", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"] 
