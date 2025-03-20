@@ -14,13 +14,9 @@ RUN apt-get update && apt-get install -y \
 # Arbeitsverzeichnis erstellen
 WORKDIR /app
 
-# Poetry installieren
-RUN pip install poetry
-
-# Dependencies nur kopieren
-COPY pyproject.toml poetry.lock ./
-RUN poetry config virtualenvs.create false && \
-    poetry install --no-dev --no-interaction --no-ansi
+# Dependencies installieren
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Beste Trainingsmodelle herunterladen
 RUN mkdir -p /usr/share/tesseract-ocr/4.00/tessdata && \
@@ -36,6 +32,7 @@ RUN apt-get update && apt-get install -y \
     tesseract-ocr-deu \
     tesseract-ocr-eng \
     libleptonica-dev \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 # Arbeitsverzeichnis erstellen
