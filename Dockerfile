@@ -9,6 +9,8 @@ RUN apt-get update && apt-get install -y \
     libleptonica-dev \
     pkg-config \
     wget \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/*
 
 # Arbeitsverzeichnis erstellen
@@ -33,6 +35,8 @@ RUN apt-get update && apt-get install -y \
     tesseract-ocr-eng \
     libleptonica-dev \
     curl \
+    libgl1-mesa-glx \
+    libglib2.0-0 \
     && rm -rf /var/lib/apt/lists/*
 
 # Arbeitsverzeichnis erstellen
@@ -50,9 +54,12 @@ RUN mkdir -p /usr/share/tesseract-ocr/4.00/tessdata/configs && \
     echo "tessedit_pageseg_mode 1\ntessedit_char_whitelist abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZäöüÄÖÜß0123456789.,- @" > /usr/share/tesseract-ocr/4.00/tessdata/configs/custom && \
     echo "deu" > /usr/share/tesseract-ocr/4.00/tessdata/configs/lang
 
+# Storage-Verzeichnisse erstellen
+RUN mkdir -p /app/storage/images /app/storage/text_files && \
+    chown -R 1000:1000 /app/storage
+
 # Nicht-Root Benutzer erstellen
 RUN useradd -m -u 1000 appuser && \
-    mkdir -p /app/storage && \
     chown -R appuser:appuser /app
 
 # Anwendungscode kopieren
