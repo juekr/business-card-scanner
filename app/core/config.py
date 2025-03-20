@@ -2,6 +2,7 @@ from pydantic_settings import BaseSettings
 from pathlib import Path
 from typing import Optional, List
 import os
+from pydantic import validator
 
 class Settings(BaseSettings):
     # API Settings
@@ -38,6 +39,12 @@ class Settings(BaseSettings):
     # Monitoring
     ENABLE_METRICS: bool = True
     METRICS_PATH: str = "/metrics"
+
+    @validator("ALLOWED_ORIGINS", pre=True)
+    def parse_allowed_origins(cls, v):
+        if isinstance(v, str):
+            return [origin.strip() for origin in v.split(",")]
+        return v
     
     class Config:
         env_file = ".env"
